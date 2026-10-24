@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>QR Code Studio — Custom QR Code Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="nav">
+    <span class="brand"><img src="logo.png" alt="" width="28" height="28"> QR Code Studio</span>
+    <nav role="tablist" aria-label="Modes">
+      <button role="tab" id="tab-gen" aria-selected="true" data-view="gen">Create</button>
+      <button role="tab" id="tab-scan" aria-selected="false" data-view="scan">Scan</button>
+    </nav>
+    <button id="themeBtn" class="ghost" aria-label="Toggle dark mode">Theme</button>
+  </header>
+
+  <section class="hero">
+    <h1>Create Beautiful QR Codes</h1>
+    <p>Turn links, Wi-Fi, contacts and text into scannable codes with your own logo. Everything runs in your browser.
+    </p>
+  </section>
+
+  <main>
+    <div id="view-gen" class="grid">
+      <div class="panel">
+        <h2>Content</h2>
+        <label for="type">Content type</label>
+        <select id="type">
+          <option value="url">Website URL</option>
+          <option value="text">Plain Text</option>
+          <option value="email">Email Address</option>
+          <option value="phone">Phone Number</option>
+          <option value="sms">SMS Message</option>
+          <option value="wifi">Wi-Fi Network</option>
+          <option value="vcard">Contact Card (vCard)</option>
+          <option value="geo">Location / Maps URL</option>
+        </select>
+        <div id="fields"></div>
+        <p id="err" class="error" role="alert"></p>
+        <div class="row"><button id="pasteBtn" class="ghost">Paste</button><button id="resetBtn"
+            class="ghost">Clear</button></div>
+
+        <h2>Style</h2>
+        <details open>
+          <summary>Pattern and colors</summary>
+          <label for="dots">Module style</label>
+          <select id="dots">
+            <option value="square">Square</option>
+            <option value="rounded">Rounded</option>
+            <option value="dots">Dots</option>
+            <option value="extra-rounded">Extra rounded</option>
+            <option value="classy">Classy</option>
+          </select>
+          <label for="eye">Finder-eye style</label>
+          <select id="eye">
+            <option value="square">Square</option>
+            <option value="extra-rounded">Rounded</option>
+            <option value="dot">Circle</option>
+          </select>
+          <div class="row">
+            <div><label for="fg">Foreground</label><input type="color" id="fg" value="#4f46e5"></div>
+            <div><label for="bg">Background</label><input type="color" id="bg" value="#ffffff"></div>
+          </div>
+          <label class="check"><input type="checkbox" id="grad"> Gradient foreground</label>
+          <div id="gradRow" class="row" hidden>
+            <div><label for="fg2">Second color</label><input type="color" id="fg2" value="#9333ea"></div>
+          </div>
+          <label class="check"><input type="checkbox" id="transp"> Transparent background (PNG/SVG)</label>
+          <label for="margin">Quiet zone: <output id="marginOut">16</output> px</label>
+          <input type="range" id="margin" min="8" max="40" value="16">
+          <p id="warn" class="warn" hidden></p>
+          <div class="presets" id="presets"></div>
+          <button id="defaultsBtn" class="ghost">Restore default style</button>
+        </details>
+        <details>
+          <summary>Center logo</summary>
+          <div id="drop" class="drop" tabindex="0" role="button" aria-label="Upload logo">Drop a PNG, JPG or WebP here,
+            or click to browse (max 2 MB)
+            <input type="file" id="file" accept="image/png,image/jpeg,image/webp" hidden>
+          </div>
+          <p id="fileErr" class="error" role="alert"></p>
+          <div id="logoCtl" hidden>
+            <div class="row"><img id="logoPrev" alt="Logo preview" width="56" height="56"><button id="logoRemove"
+                class="ghost">Remove</button></div>
+            <label for="lsize">Logo size: <output id="lsizeOut">20</output>%</label>
+            <input type="range" id="lsize" min="10" max="30" value="20">
+            <p class="hint">Larger logos hide more of the code and can make it harder to scan. Keep it at 20% or less.
+            </p>
+            <label for="lshape">Shape</label>
+            <select id="lshape">
+              <option value="square">Square</option>
+              <option value="rounded">Rounded square</option>
+              <option value="circle">Circle</option>
+            </select>
+            <label class="check"><input type="checkbox" id="lbg" checked> White background</label>
+            <label class="check"><input type="checkbox" id="lborder"> Border</label>
+            <div class="row">
+              <div><label for="lbc">Border color</label><input type="color" id="lbc" value="#4f46e5"></div>
+              <div><label for="lpad">Padding: <output id="lpadOut">8</output>%</label><input type="range" id="lpad"
+                  min="0" max="25" value="8"></div>
+            </div>
+          </div>
+        </details>
+      </div>
+
+      <div class="panel sticky">
+        <h2>Preview</h2>
+        <div id="stage" class="stage">
+          <p id="empty" class="muted">Enter content to see your QR code.</p>
+          <div id="qr"></div>
+        </div>
+        <p id="summary" class="muted"></p>
+        <h2>Download</h2>
+        <label for="filename">File name</label>
+        <input type="text" id="filename" value="qr-code-studio-website" maxlength="60">
+        <div class="row">
+          <div><label for="size">Size</label><select id="size">
+              <option>256</option>
+              <option selected>512</option>
+              <option>1024</option>
+              <option>2048</option>
+            </select></div>
+          <div><label for="fmt">Format</label><select id="fmt">
+              <option value="png">PNG</option>
+              <option value="svg">SVG</option>
+            </select></div>
+        </div>
+        <button id="dl" class="primary" disabled>Download</button>
+      </div>
+    </div>
+
+    <div id="view-scan" class="panel narrow" hidden>
+      <h2>Scan a QR code</h2>
+      <div id="reader"></div>
+      <div class="row">
+        <select id="cams" aria-label="Camera"></select>
+        <button id="startScan" class="primary">Start camera</button>
+        <button id="stopScan" class="ghost" disabled>Stop</button>
+      </div>
+      <label for="scanFile">Or scan an image</label>
+      <input type="file" id="scanFile" accept="image/*">
+      <p id="scanErr" class="error" role="alert"></p>
+      <div id="result" hidden>
+        <label for="resText">Decoded content</label>
+        <textarea id="resText" readonly rows="3"></textarea>
+        <div class="row"><button id="copyRes" class="ghost">Copy</button><button id="openRes" class="ghost" hidden>Open
+            link</button></div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>QR Studio runs entirely in your browser. Nothing you enter or upload is sent to a server. Only your theme and
+      style choices are saved locally; Wi-Fi passwords and contact details never are.</p>
+    <button id="clearData" class="ghost">Clear saved data</button>
+  </footer>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <script src="content.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
